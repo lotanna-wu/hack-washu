@@ -5,6 +5,7 @@ from player import *
 import pygame
 import sys
 from color import *
+from fruits import *
 # Constants
 
 # Main Game pl
@@ -12,13 +13,15 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption('Geometry Dash')
+        pygame.display.set_caption('Geometry Slash')
         self.clock = pygame.time.Clock()
         self.player = Player()
         self.h, self.s, self.v =200, 85, 70
         self.color = hsv_to_rgb(self.h,self.s,self.v)
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
-        
+        self.objects = []
+        self.objects.append(Obstacle())
+        self.objects.append(Fruit())
     def run(self):
         while True:
             self.handle_events()
@@ -40,10 +43,19 @@ class Game:
         if self.h>=360:
             self.h=0
         self.h+=.5
+        
+        for object in self.objects:
+            object.update()
+        
 
     def draw(self):
-        self.screen.fill(hsv_to_rgb(self.h,self.s,self.v))  # Fill the screen with white
+        self.screen.fill(hsv_to_rgb(self.h,self.s,self.v)) 
         self.player.draw(self.screen, hsv_to_rgb(self.h, self.s, self.v-20))
+        for object in self.objects:
+            if object.type == "Fruit":
+                object.draw(self.screen, (255,255,255))
+            else:
+                object.draw(self.screen, (255,0,0))
         pygame.display.flip()
 
 if __name__ == "__main__":

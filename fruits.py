@@ -1,11 +1,12 @@
 import pygame
 import random
 from settings import *
-class Obstacle:
+
+class Fruit:
     def __init__(self):
         self.x = random.randint(0, WIDTH - 50)  
         self.y = HEIGHT 
-        self.type = "Obstacle"
+        self.type = "Fruit"
         self.rect = pygame.Rect(self.x, self.y, 50, 50)
         
 
