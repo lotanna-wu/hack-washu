@@ -4,7 +4,7 @@ from obstacles import *
 from player import *
 import pygame
 import sys
-
+from color import *
 # Constants
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -18,7 +18,7 @@ class Game:
         pygame.display.set_caption('Geometry Dash')
         self.clock = pygame.time.Clock()
         self.player = Player()
-        self.color = (255,255,255)
+        self.color = hsv_to_rgb()
 
     def run(self):
         while True:
