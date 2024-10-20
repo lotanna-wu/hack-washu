@@ -14,7 +14,7 @@ class Base(object):
         self.speed_x = random.randint(-10,10)/10
         self.gravity = random.randint(11,18)/100
         self.angle = 0
-
+        self.circle = (random.randint(1,2)==1)
     def update(self):
         self.rect.y -= self.speed_y
         self.speed_y -= self.gravity
@@ -25,5 +25,8 @@ class Base(object):
             self.out_of_bounds = True
 
     def draw(self, surface, color):
-        pygame.draw.rect(surface, color, self.rect)
+        if self.circle == False:
+           pygame.draw.rect(surface, color, self.rect)
+        else:
+            pygame.draw.circle(surface, color,self.rect.center, 25)
 

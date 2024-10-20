@@ -6,7 +6,7 @@ def capture_finger(cap, cx,cy, mpHands, hands, mpDraw):
     success, img = cap.read()
     
     if not success or img is None:
-        print("Error: Could not read frame.")
+        print("Error: Could not read frame. "+str(img is None))
         return 0, 0
     
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

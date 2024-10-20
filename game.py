@@ -13,13 +13,11 @@ from hands_test import *
 pygame.mixer.init()  # Initialize the mixer module
 slash = pygame.mixer.Sound('beep.wav')
 boom = pygame.mixer.Sound('boom.wav')
-
+ambience = pygame.mixer.music.load('lofi.mp3')
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.5)
 # Cv stuff
-cap = cv2.VideoCapture(0)
 
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    exit()
 
 # Mediapipe Hands
 mpHands = mp.solutions.hands
@@ -47,14 +45,19 @@ class Game:
         #game vars
         self.score = 0
     def run(self):
+        self.cap = cv2.VideoCapture(0)
+        if not self.cap.isOpened():
+            print("Error: Could not open video.")
+            exit()
         while True:
             if self.started == True:
+                self.cx, self.cy = capture_finger(self.cap,self.cx,self.cy,mpHands,hands,mpDraw)
                 self.handle_events()
                 self.update()
                 self.draw()
-                self.cx, self.cy = capture_finger(cap,self.cx,self.cy,mpHands,hands,mpDraw)
                 self.clock.tick(60)
             else:
+                self.cx, self.cy = capture_finger(self.cap,self.cx,self.cy,mpHands,hands,mpDraw)
                 self.handle_events_home()
                 self.draw_home()
                 self.clock.tick(60)
@@ -63,7 +66,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                cap.release()
+                self.cap.release()
                 cv2.destroyAllWindows()
                 sys.exit()
 
@@ -76,8 +79,9 @@ class Game:
                 r = random.randint(8,15)
                 for i in range(r):
                     self.particles.append(Particle(self.corrected_x, self.corrected_y, size/(r/2)))
-                self.v += 20
-                self.shift_count = 20
+                if self.shift_count == 0:
+                    self.v += 20
+                    self.shift_count = 20
                     
             elif object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Obstacle":
                 self.lives -= 1
@@ -103,8 +107,6 @@ class Game:
     def update(self):
         if self.lives == 0:
             self.started = False
-            cap.release()
-            cv2.destroyAllWindows()
 
         else:
             self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
@@ -160,6 +162,9 @@ class Game:
         self.screen.fill(hsv_to_rgb(self.h,self.s,self.v)) 
         self.score_text = self.font.render("Click anywhere to start",True,hsv_to_rgb(self.h,self.s,self.v-20))
         self.screen.blit(self.score_text,(100, 50))
+
+        self.score_text = self.font.render("Avoid Darker Objects",True,hsv_to_rgb(self.h,self.s,self.v-20))
+        self.screen.blit(self.score_text,(100, 150))
         pygame.display.flip()
     
 
