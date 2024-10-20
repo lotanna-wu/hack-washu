@@ -7,9 +7,8 @@ class Obstacle:
         self.y = HEIGHT 
         self.type = "Obstacle"
         self.rect = pygame.Rect(self.x, self.y, 50, 50)
-        
 
-        self.speed_y = random.randint(5,7)
+        self.speed_y = random.randint(7,9)
         self.speed_x = random.randint(-10,10)/10
 
         self.gravity = 0.05
