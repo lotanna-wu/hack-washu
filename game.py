@@ -23,8 +23,6 @@ mpHands = mp.solutions.hands
 hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
 
-cx = 0
-cy = 0
 
 # Main Game pl
 class Game:
@@ -40,6 +38,7 @@ class Game:
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
         self.objects = []
         self.objects.append(Obstacle())
+        self.cx, self.cy = 0,0
         self.objects.append(Fruit())
 
     def run(self):
@@ -47,7 +46,7 @@ class Game:
             self.handle_events()
             self.update()
             self.draw()
-            capture_finger(cap,cx,cy,mpHands,hands,mpDraw)
+            self.cx, self.cy = capture_finger(cap,self.cx,self.cy,mpHands,hands,mpDraw)
             self.clock.tick(60)
 
 
@@ -71,7 +70,7 @@ class Game:
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
 
-        self.player.move(self.mouse_x, self.mouse_y)
+        self.player.move(self.cx, self.cy)
         if self.h>=360: # colorshifting
             self.h=0
         self.h+=.5
