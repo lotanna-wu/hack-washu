@@ -16,9 +16,10 @@ def capture_finger(cap, cx,cy, mpHands, hands, mpDraw):
         handLandmark = results.multi_hand_landmarks[0]
         for id, lm in enumerate(handLandmark.landmark):
             h, w,c = img.shape
-            cx, cy = int(lm.x * w), int(lm.y * h)
+            px, py = int(lm.x * w), int(lm.y * h)
             if id == 8:  # Index of the tip of the index finger
-                cv2.circle(img, (cx, cy), 15, (255, 0, 0), cv2.FILLED)
+                cv2.circle(img, (px, py), 15, (255, 0, 0), cv2.FILLED)
+                cx,cy = px, py
         mpDraw.draw_landmarks(img, handLandmark, mpHands.HAND_CONNECTIONS)
     
     cv2.imshow("Image", img)
@@ -27,9 +28,9 @@ def capture_finger(cap, cx,cy, mpHands, hands, mpDraw):
 def correct(x,y):
     max_x = 650
     max_y=500
-    if x <0:
-        x=0
-    if y < 0:
-        y =0
+    #if x <0:
+    #    x=0
+    #if y < 0:
+    #    y =0
     
-    return (max_x-x)*1.538,y*1.6
+    return (max_x-x)*1.638,y*1.8
