@@ -1,5 +1,7 @@
-# hack-dogtag
-Hack WashU Competition
-install pygame in terminal
-make sure you have python too
-pip install pygame
+## Setup Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+
