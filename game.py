@@ -34,13 +34,11 @@ class Game:
         self.player = Player()
         self.h, self.s, self.v =200, 85, 70
         self.color = hsv_to_rgb(self.h,self.s,self.v)
-        self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
         self.objects = []
-        self.objects.append(Obstacle())
         self.cx, self.cy = 0,0
-        self.objects.append(Fruit())
-
+        self.corrected_x, self.corrected_y = correct(0,0)
+        
     def run(self):
         while True:
             self.handle_events()
@@ -58,25 +56,33 @@ class Game:
                 cap.release()
                 cv2.destroyAllWindows()
 
-        if self.left_button == True:
-            for object in self.objects:
-                if object.rect.collidepoint(self.mouse_x, self.mouse_y) and object.type=="Fruit":
-                    print("Hit fruit")
-                elif object.rect.collidepoint(self.mouse_x, self.mouse_y) and object.type=="Obstacle":
-                    print("Bad")
+        for object in self.objects:
+            if object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Fruit":
+                print("Hit fruit")
+            elif object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Obstacle":
+                print("Bad")
                         
 
     def update(self):
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
-
-        self.player.move(self.cx, self.cy)
+        self.corrected_x, self.corrected_y = correct(self.cx,self.cy)
+        self.player.move(self.corrected_x, self.corrected_y)
         if self.h>=360: # colorshifting
             self.h=0
         self.h+=.5
 
         for object in self.objects:
-            object.update()
+            if object.out_of_bounds == True:
+                self.objects.remove(object)
+            else:
+                object.update()
+        if len(self.objects) == 0:
+            for i in range(random.randint(1,4)):
+                if random.randint(1,4)==1:
+                    self.objects.append(Obstacle())
+                else:
+                    self.objects.append(Fruit())
         
 
     def draw(self):
@@ -91,5 +97,3 @@ class Game:
 
 if __name__ == "__main__":
     Game().run()
-
-    
