@@ -62,12 +62,12 @@ class Game:
                 self.handle_events()
                 self.update()
                 self.draw()
-                self.clock.tick(60)
+                self.clock.tick(FPS)
             else:
                 self.cx, self.cy = capture_finger(self.cap,self.cx,self.cy,mpHands,hands,mpDraw)
                 self.handle_events_home()
                 self.draw_home()
-                self.clock.tick(60)
+                self.clock.tick(FPS)
 
     def handle_events(self):
         for event in pygame.event.get():

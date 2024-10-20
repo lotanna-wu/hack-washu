@@ -1,4 +1,3 @@
 
 RES = WIDTH, HEIGHT = 1040,800
-
 FPS = 60
