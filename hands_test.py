@@ -7,20 +7,21 @@ def capture_finger(cap, cx,cy, mpHands, hands, mpDraw):
     
     if not success or img is None:
         print("Error: Could not read frame.")
-        return
+        return 0, 0
     
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = hands.process(imgRGB)
 
     if results.multi_hand_landmarks:
-        for handLandmark in results.multi_hand_landmarks:
-            for id, lm in enumerate(handLandmark.landmark):
-                h, w, c = img.shape
-                cx, cy = int(lm.x * w), int(lm.y * h)
-                if id == 8:  # Index of the tip of the index finger
-                    cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
-            mpDraw.draw_landmarks(img, handLandmark, mpHands.HAND_CONNECTIONS)
+        handLandmark = results.multi_hand_landmarks[0]
+        for id, lm in enumerate(handLandmark.landmark):
+            h, w,c = img.shape
+            cx, cy = int(lm.x * w), int(lm.y * h)
+            if id == 8:  # Index of the tip of the index finger
+                cv2.circle(img, (cx, cy), 15, (255, 0, 0), cv2.FILLED)
+        mpDraw.draw_landmarks(img, handLandmark, mpHands.HAND_CONNECTIONS)
     
+    cv2.imshow("Image", img)
     return cx,cy
 
 def correct(x,y):
@@ -31,4 +32,4 @@ def correct(x,y):
     if y < 0:
         y =0
     
-    return int((max_x-x)*1.538),int(y*1.6)
+    return (max_x-x)*1.538,y*1.6

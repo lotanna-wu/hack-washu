@@ -27,18 +27,21 @@ mpDraw = mp.solutions.drawing_utils
 # Main Game pl
 class Game:
     def __init__(self):
+        pygame.display.set_caption('Geometry Slash')
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption('Geometry Slash')
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font(None, 100)
+
         self.player = Player()
-        self.h, self.s, self.v =200, 85, 70
+        self.h, self.s, self.v = 0, 85, 70
         self.color = hsv_to_rgb(self.h,self.s,self.v)
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
         self.objects = []
         self.cx, self.cy = 0,0
         self.corrected_x, self.corrected_y = correct(0,0)
-        
+        #game vars
+        self.score = 0
     def run(self):
         while True:
             self.handle_events()
@@ -58,16 +61,19 @@ class Game:
 
         for object in self.objects:
             if object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Fruit":
-                print("Hit fruit")
+                self.objects.remove(object)
             elif object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Obstacle":
-                print("Bad")
+                self.objects.remove(object)
+
                         
 
     def update(self):
+
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
         self.left_button, self.middle_button, self.right_button = pygame.mouse.get_pressed()
         self.corrected_x, self.corrected_y = correct(self.cx,self.cy)
         self.player.move(self.corrected_x, self.corrected_y)
+        
         if self.h>=360: # colorshifting
             self.h=0
         self.h+=.5
@@ -87,11 +93,13 @@ class Game:
 
     def draw(self):
         self.screen.fill(hsv_to_rgb(self.h,self.s,self.v)) 
+        self.score_text = self.font.render(str(self.score),True,hsv_to_rgb(self.h,self.s,self.v-20))
+        self.screen.blit(self.score_text,(int(WIDTH/2), 50))
         self.player.draw(self.screen, hsv_to_rgb(self.h, self.s, self.v-20))
         for object in self.objects:
             if object.type == "Fruit":
                 object.draw(self.screen, (255,255,255))
-            else:
+            elif object.type == "Obstacle":
                 object.draw(self.screen, (255,0,0))
         pygame.display.flip()
 
