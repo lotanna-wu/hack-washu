@@ -34,16 +34,23 @@ class Game:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 100)
         self.player = Player()
+
         self.h, self.s, self.v = 0, 85, 70
-        self.lives = 3
         self.started = False
         self.color = hsv_to_rgb(self.h,self.s,self.v)
         self.objects = []
         self.cx,self.cy = 0,0
         self.particles = []
         self.shift_count = 0
-        #game vars
+
+        self.lives = 3
         self.score = 0
+        self.highscore = 0
+
+        self.score_text = self.font.render(("Score: " + str(self.score)),True,hsv_to_rgb(self.h,self.s,self.v-20))
+        self.highscore_text = self.font.render(("High: " + str(max(self.score, self.highscore))),True,hsv_to_rgb(self.h,self.s,self.v-20))
+        self.health_text = self.font.render(("Lives: " + str(self.lives)),True,hsv_to_rgb(self.h,self.s,self.v-20))
+
     def run(self):
         self.cap = cv2.VideoCapture(0)
         if not self.cap.isOpened():
@@ -64,13 +71,13 @@ class Game:
 
     def handle_events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: #end the program if the user wants to quit
                 pygame.quit()
                 self.cap.release()
                 cv2.destroyAllWindows()
                 sys.exit()
-
-        for object in self.objects:
+            
+        for object in self.objects: #iterate through each object, remove the ones that the player hits and add explosion effect
             if object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Fruit":
                 size = object.rect.width
                 self.objects.remove(object)
@@ -83,7 +90,7 @@ class Game:
                     self.v += 20
                     self.shift_count = 20
                     
-            elif object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Obstacle":
+            elif object.rect.collidepoint(self.corrected_x, self.corrected_y) and object.type=="Obstacle": 
                 self.lives -= 1
                 size = object.rect.width
                 self.objects.remove(object)
@@ -95,7 +102,7 @@ class Game:
                     self.v += 20
                     self.shift_count = 20
         
-    def handle_events_home(self):
+    def handle_events_home(self): #the home page events, see if player starts game
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -103,10 +110,13 @@ class Game:
             if event.type == pygame.MOUSEBUTTONUP:
                 self.started = True
                 self.lives = 3
+                self.score = 0
 
-    def update(self):
+    def update(self): #updating game logic
         if self.lives == 0:
             self.started = False
+            self.highscore = max(self.score, self.highscore)
+            
 
         else:
             self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
@@ -134,7 +144,7 @@ class Game:
                     object.update()
             
             if len(self.objects) == 0:
-                for i in range(random.randint(1,4)):
+                for i in range(random.randint(2,5)):
                     if random.randint(1,4)==1:
                         self.objects.append(Obstacle())
                     else:
@@ -142,13 +152,22 @@ class Game:
        
         
 
-    def draw(self):
+    def draw(self): #redrawing game stuff
+        score_width = self.score_text.get_width()
+        highscore_width = self.highscore_text.get_width()
+        health_width = self.health_text.get_width()
+        total_width = score_width + highscore_width + health_width + 40
+
+        start_x = (WIDTH - total_width) // 2
         self.screen.fill(hsv_to_rgb(self.h,self.s,self.v)) 
         self.score_text = self.font.render(("Score: " + str(self.score)),True,hsv_to_rgb(self.h,self.s,self.v-20))
-        self.screen.blit(self.score_text,((WIDTH-400), 50))
+        self.highscore_text = self.font.render(("High: " + str(max(self.score, self.highscore))),True,hsv_to_rgb(self.h,self.s,self.v-20))
         self.health_text = self.font.render(("Lives: " + str(self.lives)),True,hsv_to_rgb(self.h,self.s,self.v-20))
-        self.screen.blit(self.health_text,(100, 50))
+        self.screen.blit(self.score_text,(start_x, 50))
+        self.screen.blit(self.highscore_text,(start_x + score_width + 20, 50))
+        self.screen.blit(self.health_text,(start_x + score_width + highscore_width + 40, 50))
         self.player.draw(self.screen, hsv_to_rgb(self.h, self.s, self.v-20))
+
         for object in self.objects:
             if object.type == "Fruit":
                 object.draw(self.screen, hsv_to_rgb(self.h,self.s,self.v-20))
@@ -158,18 +177,21 @@ class Game:
             particle.draw(self.screen, hsv_to_rgb(self.h,self.s,self.v-20))
         pygame.display.flip()
 
-    def draw_home(self):
+    def draw_home(self): #redrawing home stuff
         self.screen.fill(hsv_to_rgb(self.h,self.s,self.v)) 
         self.score_text = self.font.render("Click anywhere to start",True,hsv_to_rgb(self.h,self.s,self.v-20))
         self.screen.blit(self.score_text,(100, 50))
 
         self.score_text = self.font.render("Avoid Darker Objects",True,hsv_to_rgb(self.h,self.s,self.v-20))
         self.screen.blit(self.score_text,(100, 150))
+
+        self.score_text = self.font.render("High: "+str(self.highscore),True,hsv_to_rgb(self.h,self.s,self.v-20))
+        self.screen.blit(self.score_text,(100, 300))
         pygame.display.flip()
     
 
 
 
 if __name__ == "__main__":
-    Game().run()
+    Game().run()#runs the game
 
